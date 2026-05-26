@@ -34,7 +34,8 @@
       "Bash(avconvert --source \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.MOV\" --output \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.mp4\" --preset PresetHighestQuality)",
       "Bash(avconvert --source \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.MOV\" --output \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.mp4\" --preset Preset1280x720)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

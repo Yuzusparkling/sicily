@@ -71,6 +71,22 @@ function shuffleShaders(): ShaderName[] {
 const SCROLL_THRESHOLD = 150;
 const TRANSITION_COOLDOWN_MS = 800;
 
+// ── Mobile detection ─────────────────────────────────────────────────────────
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < breakpoint : false
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    setIsMobile(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function Clock() {
@@ -79,6 +95,8 @@ export default function Clock() {
   const [fragments, setFragments] = useState<FloatingFragment[]>([]);
   const [selectedPhotoIdx, setSelectedPhotoIdx] = useState(0);
   const [hoveredPhotoIdx, setHoveredPhotoIdx] = useState<number | null>(null);
+
+  const isMobile = useIsMobile();
 
   // Assign a random shader to each era on mount (stable for the session)
   const eraShaders = useMemo(() => shuffleShaders(), []);
@@ -132,7 +150,38 @@ export default function Clock() {
     };
 
     el.addEventListener("wheel", handleWheel, { passive: false });
-    return () => el.removeEventListener("wheel", handleWheel);
+
+    // Touch handling for mobile swipe
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isTransitioningRef.current) return;
+      const deltaY = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(deltaY) < 50) return; // ignore small swipes
+      if (deltaY > 0) {
+        setEraIndex(prev => {
+          if (prev >= ERAS.length - 1) return prev;
+          isTransitioningRef.current = true;
+          setTimeout(() => { isTransitioningRef.current = false; }, TRANSITION_COOLDOWN_MS);
+          return prev + 1;
+        });
+      } else {
+        setEraIndex(prev => {
+          if (prev <= 0) return prev;
+          isTransitioningRef.current = true;
+          setTimeout(() => { isTransitioningRef.current = false; }, TRANSITION_COOLDOWN_MS);
+          return prev - 1;
+        });
+      }
+    };
+    el.addEventListener("touchstart", handleTouchStart, { passive: true });
+    el.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchend", handleTouchEnd);
+    };
   }, []);
 
   // Advance wheel one slot every 5s; spawn word fragments.
@@ -191,6 +240,174 @@ export default function Clock() {
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
+
+  if (isMobile) {
+    return (
+      <div
+        ref={containerRef}
+        className="relative w-screen h-screen overflow-hidden select-none"
+        style={{ background: "#050508", fontFamily: "'Cormorant Garamond', 'Cinzel', serif" }}
+      >
+        {/* Marble shader background */}
+        <MarbleShader eraColor={hexToRgb(accent)} shader={eraShaders[eraIndex]} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,0.35)", zIndex: 1 }} />
+
+        {/* Main vertical layout */}
+        <div className="absolute inset-0 z-10" style={{ display: "flex", flexDirection: "column" }}>
+
+          {/* Top: Era lockup row */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={era.id + "-lockup"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              style={{ padding: "16px 20px 0", display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}
+            >
+              <div style={{
+                width: "48px", height: "48px", borderRadius: "50%", overflow: "hidden", flexShrink: 0,
+                border: `1.5px solid ${accent}40`, boxShadow: `0 0 16px ${accent}20`,
+              }}>
+                <img src={era.heroImage} alt={era.eraLabel}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: era.id === "modern" ? "center center" : "center top", display: "block" }} />
+              </div>
+              <div>
+                <p style={{ fontSize: "10px", letterSpacing: "0.28em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", fontWeight: 400, color: accent, opacity: 0.7, margin: 0, marginBottom: "2px" }}>
+                  {era.period}
+                </p>
+                <p style={{ fontSize: "18px", fontFamily: "'Cinzel', serif", fontWeight: 300, letterSpacing: "0.12em", color: "rgba(255,255,255,0.7)", lineHeight: 1.1, margin: 0 }}>
+                  {era.eraLabel}
+                </p>
+              </div>
+              <span style={{
+                marginLeft: "auto", fontSize: "32px", fontFamily: "'Cinzel', serif", fontWeight: 700,
+                color: accent, opacity: 0.5, lineHeight: 1, transition: "color 3s",
+              }}>
+                {era.eraIndex}
+              </span>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Photo area */}
+          <div style={{ position: "relative", width: "100%", aspectRatio: "4 / 3", overflow: "hidden", flexShrink: 0, marginTop: "8px" }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`photo-m-${era.id}-${selectedPhotoIdx}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                style={{ position: "absolute", inset: 0 }}
+              >
+                {currentPhoto.endsWith(".MOV") || currentPhoto.endsWith(".mp4") ? (
+                  <video src={currentPhoto} autoPlay muted loop playsInline
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: currentPhotoObj.objectPosition ?? "center", display: "block" }} />
+                ) : (
+                  <img src={currentPhoto} alt={currentPhotoObj.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: currentPhotoObj.objectPosition ?? "center", display: "block" }} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+            {/* Bottom fade */}
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(to top, #050508, transparent)", pointerEvents: "none" }} />
+            {/* Overlay text */}
+            <div style={{ position: "absolute", bottom: "10px", left: "16px", right: "16px" }}>
+              <AnimatePresence mode="wait">
+                <motion.div key={`${era.id}-${activeTitle}-m`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                  <p style={{ fontSize: "10px", letterSpacing: "0.28em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", fontWeight: 400, color: "rgba(255,255,255,0.85)", margin: 0, marginBottom: "3px" }}>
+                    {activeLocation}
+                  </p>
+                  <h2 style={{ fontSize: "18px", fontFamily: "'Cinzel', serif", fontWeight: 300, letterSpacing: "0.12em", color: "rgba(255,255,255,0.92)", lineHeight: 1.1, margin: 0 }}>
+                    {activeTitle}
+                  </h2>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Thumbnails */}
+          <div style={{ display: "flex", gap: "6px", padding: "10px 16px 0", flexWrap: "wrap" }}>
+            {era.placePhotos.map((photo, idx) => {
+              const isActive = idx === selectedPhotoIdx;
+              const isVideo = photo.src.endsWith(".MOV") || photo.src.endsWith(".mp4");
+              return (
+                <button key={idx} onClick={() => setSelectedPhotoIdx(idx)}
+                  style={{
+                    width: "44px", height: "44px", borderRadius: "5px", overflow: "hidden",
+                    border: isActive ? `2px solid ${accent}` : "2px solid rgba(255,255,255,0.12)",
+                    opacity: isActive ? 1 : 0.5, transition: "all 0.3s", cursor: "pointer", padding: 0, background: "transparent", flexShrink: 0,
+                  }}>
+                  {isVideo ? (
+                    <video src={photo.src} muted style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  ) : (
+                    <img src={photo.src} alt={photo.caption} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Caption */}
+          <div style={{ padding: "10px 20px 0", minHeight: "60px" }}>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={activeCaption}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                style={{ fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)", fontFamily: "'Cormorant Garamond', serif", margin: 0 }}
+              >
+                {activeCaption}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+
+          {/* Quote + translation area */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 20px", overflow: "hidden" }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`hlm-${era.id}-${highlightedArcIdx}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.8 }}
+              >
+                <span style={{
+                  fontSize: "18px", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
+                  color: accent, lineHeight: 1.4, display: "block", fontWeight: 500, transition: "color 3s",
+                  textShadow: `0 0 20px ${accent}60`,
+                }}>
+                  {highlightedQuote}
+                </span>
+                <span style={{
+                  fontSize: "14px", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
+                  color: "rgba(255,255,255,0.40)", lineHeight: 1.5, display: "block", marginTop: "8px",
+                }}>
+                  &ldquo;{highlightedTranslation}&rdquo;
+                </span>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Swipe hint */}
+          <motion.div
+            style={{ padding: "0 0 16px", textAlign: "center" }}
+            initial={{ opacity: 0.4 }}
+            animate={{ opacity: [0.4, 0.15, 0.4] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <p style={{ fontSize: "8px", letterSpacing: "0.25em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", color: "rgba(255,255,255,0.3)", margin: 0 }}>
+              {eraIndex < ERAS.length - 1 ? "↑ SWIPE TO TRAVEL FORWARD" : "↓ SWIPE TO TRAVEL BACK"}
+            </p>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop render ─────────────────────────────────────────────────────────
 
   return (
     <div
