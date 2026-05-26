@@ -673,7 +673,7 @@ export default function Clock() {
           >
             {/* Era label row */}
             <div style={{ padding: "22px 24px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "10px", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", color: accent, opacity: 0.7, transition: "color 3s" }}>
+              <span style={{ fontSize: "15px", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", color: accent, opacity: 0.7, transition: "color 3s" }}>
                 {era.eraLabel}
               </span>
               <div style={{ width: "2px", height: "20px", background: accent, opacity: 0.4, transition: "background 3s" }} />
@@ -710,7 +710,7 @@ export default function Clock() {
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(to top, #0d0d0f, transparent)", pointerEvents: "none" }} />
 
               {/* Overlay text — bottom of image */}
-              <div style={{ position: "absolute", bottom: "12px", left: "16px", right: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+              <div style={{ position: "absolute", bottom: "12px", left: "24px", right: "24px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`${era.id}-${activeTitle}`}
