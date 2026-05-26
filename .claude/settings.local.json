@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xxd)",
+      "Bash(npx tsc *)",
+      "Bash(brew list *)",
+      "Read(//Users/yueranzhao/**)",
+      "Read(//usr/local/**)",
+      "Read(//Applications/**)",
+      "Bash(curl -fsSL https://fnm.vercel.app/install)",
+      "Bash(bash)",
+      "Bash(curl -fsSL https://github.com/Schniz/fnm/releases/latest/download/fnm-macos.zip -o /tmp/fnm.zip)",
+      "Bash(unzip -o /tmp/fnm.zip -d /tmp/fnm-bin)",
+      "Bash(mkdir -p ~/.local/bin)",
+      "Bash(mv /tmp/fnm-bin/fnm ~/.local/bin/fnm)",
+      "Bash(chmod +x ~/.local/bin/fnm)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebSearch",
+      "WebFetch(domain:penelope.uchicago.edu)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:publicmedievalist.com)",
+      "WebFetch(domain:www.attalus.org)",
+      "WebFetch(domain:eprints.bbk.ac.uk)",
+      "WebFetch(domain:www.thelatinlibrary.com)",
+      "WebFetch(domain:picryl.com)",
+      "WebFetch(domain:www.artic.edu)",
+      "WebFetch(domain:commons.wikimedia.org)",
+      "WebFetch(domain:warfare.6te.net)",
+      "WebFetch(domain:artvee.com)",
+      "WebFetch(domain:api.artic.edu)",
+      "Bash(which brew *)",
+      "Bash(python3 -c \"import subprocess; print\\('python3 available'\\)\")",
+      "Bash(avconvert --source \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.MOV\" --output \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.mp4\" --preset PresetHEVCHighestQualityWithAlpha)",
+      "Bash(avconvert --source \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.MOV\" --output \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.mp4\" --preset PresetHighestQuality)",
+      "Bash(avconvert --source \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.MOV\" --output \"/Users/yueranzhao/Downloads/Interactive Project Inspired by Agrigento Greek Temples/public/photos/6-modern.mp4\" --preset Preset1280x720)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
