@@ -4,12 +4,14 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import Home from "./pages/Home";
 import Clock from "./pages/Clock";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Clock} />
+      <Route path={"/"} component={Home} />
+      <Route path={"/timeline"} component={Clock} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
