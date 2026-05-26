@@ -671,16 +671,29 @@ export default function Clock() {
             transition={{ duration: 0.8 }}
             style={{ display: "flex", flexDirection: "column", height: "100%" }}
           >
-            {/* Era label row */}
-            <div style={{ padding: "22px 24px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "15px", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", color: accent, opacity: 0.7, transition: "color 3s" }}>
-                {era.eraLabel}
-              </span>
-              <div style={{ width: "2px", height: "20px", background: accent, opacity: 0.4, transition: "background 3s" }} />
-            </div>
-
-            {/* Hero image area — 5:4 aspect ratio with overlay text */}
+            {/* Hero image area — bleeds to top edge */}
             <div style={{ position: "relative", width: "100%", aspectRatio: "5 / 4", overflow: "hidden", flexShrink: 0 }}>
+              {/* Era label — inline black background behind text, floating over image */}
+              <div style={{
+                position: "absolute", top: "14px", left: "24px", zIndex: 2,
+                display: "inline-flex", alignItems: "center", gap: "0px",
+              }}>
+                <span style={{
+                  fontSize: "15px", letterSpacing: "0.35em", textTransform: "uppercase",
+                  fontFamily: "'Cinzel', serif", fontWeight: 400, color: accent, opacity: 0.9,
+                  transition: "color 3s",
+                  background: "#000",
+                  padding: "8px 14px", lineHeight: 1.4,
+                  display: "inline",
+                  boxDecorationBreak: "clone" as any,
+                  WebkitBoxDecorationBreak: "clone" as any,
+                }}>
+                  {era.eraLabel}
+                  <span style={{ fontSize: "17px", letterSpacing: "0.15em", marginLeft: "12px", fontWeight: 700, fontFamily: "'Cormorant Garamond', serif", textTransform: "none", fontStyle: "italic" }}>
+                    {era.layerTags}
+                  </span>
+                </span>
+              </div>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`photo-${era.id}-${selectedPhotoIdx}`}

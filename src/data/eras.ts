@@ -34,6 +34,7 @@ export interface Era {
   placeDescription: string; // experiential description of the place
   landmark: Landmark;
   writings: Writing[];
+  layerTags: string;           // short keywords summarizing what this era left behind
   quoteSource: string;         // one-liner describing where the quotes come from
   arcQuotes: string[];         // 6 short quote fragments in native language; cycled to fill the 12-slot spinning wheel
   arcTranslations: string[];   // 6 matching English translations, 1:1 with arcQuotes
@@ -58,6 +59,7 @@ export const ERAS: Era[] = [
     ],
     whoDescription: "A Syracuse fisherman, dreaming of golden catches in the harbor shadow of Apollo's temple — drawn from Theocritus' twenty-first Idyll.",
     placeDescription: "The Greeks left theaters, temples, and the idea of the city itself. The Theater of Taormina still hosts performances. The Valley of the Temples in Agrigento is one of the best-preserved Greek sites outside Greece — you can still see the Doric columns towering on the hilltop, watching over the people as you drive into the city.",
+    layerTags: "City · Theater · Temple",
     quoteSource: "Theocritus, Idyll XXI — The Fishermen, c. 270 BCE",
     arcQuotes: [
       "Ἁ πενία, Διόφαντε, μόνα τὰς τέχνας ἐγείρει",
@@ -138,8 +140,9 @@ export const ERAS: Era[] = [
     period: "247 BCE",
     symbol: "Sign of Tanit",
     symbolEmoji: "🌙",
-    color: "#8B1A4A",
+    color: "#D4467A",
     colorDim: "#150008",
+    layerTags: "Salt Flats · Purple Dye · Causeways",
     quoteSource: "Polybius, Histories Book I — The First Punic War, c. 150 BCE",
     arcQuotes: [
       "Ἀμίλκας ὁ Βάρκας διέβη εἰς Σικελίαν",
@@ -220,8 +223,9 @@ export const ERAS: Era[] = [
     period: "70 BCE",
     symbol: "Mosaic tile",
     symbolEmoji: "🦅",
-    color: "#8B0000",
+    color: "#C94040",
     colorDim: "#150000",
+    layerTags: "Roads · Arena · Grain",
     quoteSource: "Cicero, In Verrem — The Prosecution of Verres, 70 BCE",
     arcQuotes: [
       "Recepi causam Siciliae",
@@ -303,8 +307,9 @@ export const ERAS: Era[] = [
     period: "1056 CE",
     symbol: "Geometric star pattern",
     symbolEmoji: "⭐",
-    color: "#2E7D32",
+    color: "#4CAF50",
     colorDim: "#010f01",
+    layerTags: "Citrus · Sugar · Love & Revenge",
     quoteSource: "Ibn Hamdis al-Siqilli — Exile poetry from Syracuse, c. 1090 CE",
     arcQuotes: [
       "ذَكَرتُ صِقِلِّيَةَ وَالأَسى يَهيجُ بِنَفسي",
@@ -375,8 +380,8 @@ export const ERAS: Era[] = [
     eraIndex: "05",
     heroImage: "/photos/hero_norman.png",
     placePhotos: [
-      { src: "/photos/5-norman-palermo.jpg", title: "Palatine Chapel", location: "Palermo", caption: "The royal chapel of the Norman kings, where Byzantine gold mosaics meet an Arab muqarnas ceiling under Norman arches — three civilizations in one room." },
-      { src: "/photos/5-norman-cefalu.JPG", title: "Cathedral of Cefalu", location: "Cefalu", caption: "Built by Roger II beginning in 1131, the cathedral dominates the coastal town from its clifftop perch. Its golden apse mosaic of Christ Pantocrator is one of the finest in Sicily." },
+      { src: "/photos/5-norman-palermo.jpg", title: "Palatine Chapel", location: "Palermo", caption: "The royal chapel of the Norman kings, consecrated in 1140 inside the Palazzo dei Normanni. Byzantine gold mosaics cover the walls, an Arab muqarnas ceiling floats overhead like a honeycomb of stars, and Norman arches hold it all together — three civilizations fused into one room." },
+      { src: "/photos/5-norman-cefalu.JPG", title: "Cathedral of Cefalu", location: "Cefalu", caption: "Built by Roger II beginning in 1131, the cathedral dominates the coastal town from its clifftop perch, visible from miles out at sea. Its golden apse mosaic of Christ Pantocrator — enormous, serene, inescapable — is one of the finest in Sicily." },
     ],
     whoDescription: "Roger II, the Norman king crowned in 1130, who built the Cappella Palatina and wore a mantle embroidered with Arabic script — ruler of the most cosmopolitan court in medieval Europe.",
     placeDescription: "The Normans left the cathedrals — Monreale, Cefalù, the Cappella Palatina — where Byzantine gold mosaics meet Arab muqarnas ceilings under Norman arches. Every town with a castle on a cliff is probably Norman.",
@@ -387,6 +392,7 @@ export const ERAS: Era[] = [
     symbolEmoji: "👑",
     color: "#B8860B",
     colorDim: "#130d00",
+    layerTags: "Castles · Fusion · Crown",
     quoteSource: "Roger II's Royal Mantle & Cappella Palatina inscriptions, c. 1134 CE",
     arcQuotes: [
       "عُمِلَ في الطِراز المَلَكي المَعمور",
@@ -469,6 +475,7 @@ export const ERAS: Era[] = [
     symbolEmoji: "🚗",
     color: "#607D8B",
     colorDim: "#050a0d",
+    layerTags: "Diaspora · Ruins · Concrete",
     quoteSource: "Yueran's diary in Sicily, 2026",
     arcQuotes: [
       "从没吃过这么好吃的冰沙，口感细腻，层次丰富",
