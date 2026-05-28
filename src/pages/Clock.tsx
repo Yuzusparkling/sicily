@@ -73,7 +73,7 @@ const TRANSITION_COOLDOWN_MS = 800;
 
 // ── Mobile detection ─────────────────────────────────────────────────────────
 
-function useIsMobile(breakpoint = 768) {
+function useIsMobile(breakpoint = 1024) {
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < breakpoint : false
   );
@@ -250,7 +250,7 @@ export default function Clock() {
       >
         {/* Marble shader background */}
         <MarbleShader eraColor={hexToRgb(accent)} shader={eraShaders[eraIndex]} />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,0.35)", zIndex: 1 }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,0.60)", zIndex: 1 }} />
 
         {/* Main vertical layout */}
         <div className="absolute inset-0 z-10" style={{ display: "flex", flexDirection: "column" }}>
@@ -290,7 +290,7 @@ export default function Clock() {
           </AnimatePresence>
 
           {/* Photo area */}
-          <div style={{ position: "relative", width: "100%", aspectRatio: "4 / 3", overflow: "hidden", flexShrink: 0, marginTop: "8px" }}>
+          <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 2", overflow: "hidden", flexShrink: 0, marginTop: "8px" }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={`photo-m-${era.id}-${selectedPhotoIdx}`}
@@ -326,82 +326,86 @@ export default function Clock() {
             </div>
           </div>
 
-          {/* Thumbnails */}
-          <div style={{ display: "flex", gap: "6px", padding: "10px 16px 0", flexWrap: "wrap" }}>
-            {era.placePhotos.map((photo, idx) => {
-              const isActive = idx === selectedPhotoIdx;
-              const isVideo = photo.src.endsWith(".MOV") || photo.src.endsWith(".mp4");
-              return (
-                <button key={idx} onClick={() => setSelectedPhotoIdx(idx)}
-                  style={{
-                    width: "44px", height: "44px", borderRadius: "5px", overflow: "hidden",
-                    border: isActive ? `2px solid ${accent}` : "2px solid rgba(255,255,255,0.12)",
-                    opacity: isActive ? 1 : 0.5, transition: "all 0.3s", cursor: "pointer", padding: 0, background: "transparent", flexShrink: 0,
+          {/* Lower content — solid background so text is readable over shader */}
+          <div style={{ display: "flex", flexDirection: "column", flex: 1, background: "#050508" }}>
+
+            {/* Thumbnails */}
+            <div style={{ display: "flex", gap: "6px", padding: "10px 16px 0", flexWrap: "nowrap", overflowX: "auto", flexShrink: 0 }}>
+              {era.placePhotos.map((photo, idx) => {
+                const isActive = idx === selectedPhotoIdx;
+                const isVideo = photo.src.endsWith(".MOV") || photo.src.endsWith(".mp4");
+                return (
+                  <button key={idx} onClick={() => setSelectedPhotoIdx(idx)}
+                    style={{
+                      width: "44px", height: "44px", borderRadius: "5px", overflow: "hidden",
+                      border: isActive ? `2px solid ${accent}` : "2px solid rgba(255,255,255,0.12)",
+                      opacity: isActive ? 1 : 0.5, transition: "all 0.3s", cursor: "pointer", padding: 0, background: "transparent", flexShrink: 0,
+                    }}>
+                    {isVideo ? (
+                      <video src={photo.src} muted style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    ) : (
+                      <img src={photo.src} alt={photo.caption} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Caption */}
+            <div style={{ padding: "10px 20px 0", flexShrink: 0 }}>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={activeCaption}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ fontSize: "13px", lineHeight: 1.5, color: "rgba(255,255,255,0.5)", fontFamily: "'Cormorant Garamond', serif", margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+                >
+                  {activeCaption}
+                </motion.p>
+              </AnimatePresence>
+            </div>
+
+            {/* Quote + translation area */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 20px", minHeight: "100px", overflow: "hidden" }}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`hlm-${era.id}-${highlightedArcIdx}`}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <span style={{
+                    fontSize: "18px", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
+                    color: accent, lineHeight: 1.4, display: "block", fontWeight: 500, transition: "color 3s",
+                    textShadow: `0 0 20px ${accent}60`,
                   }}>
-                  {isVideo ? (
-                    <video src={photo.src} muted style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  ) : (
-                    <img src={photo.src} alt={photo.caption} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+                    {highlightedQuote}
+                  </span>
+                  <span style={{
+                    fontSize: "14px", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
+                    color: "rgba(255,255,255,0.40)", lineHeight: 1.5, display: "block", marginTop: "8px",
+                  }}>
+                    &ldquo;{highlightedTranslation}&rdquo;
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-          {/* Caption */}
-          <div style={{ padding: "10px 20px 0", minHeight: "60px" }}>
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={activeCaption}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.3 }}
-                style={{ fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)", fontFamily: "'Cormorant Garamond', serif", margin: 0 }}
-              >
-                {activeCaption}
-              </motion.p>
-            </AnimatePresence>
+            {/* Swipe hint */}
+            <motion.div
+              style={{ padding: "0 0 16px", textAlign: "center" }}
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: [0.4, 0.15, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <p style={{ fontSize: "8px", letterSpacing: "0.25em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", color: "rgba(255,255,255,0.3)", margin: 0 }}>
+                {eraIndex < ERAS.length - 1 ? "↑ SWIPE TO TRAVEL FORWARD" : "↓ SWIPE TO TRAVEL BACK"}
+              </p>
+            </motion.div>
           </div>
-
-          {/* Quote + translation area */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 20px", overflow: "hidden" }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`hlm-${era.id}-${highlightedArcIdx}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.8 }}
-              >
-                <span style={{
-                  fontSize: "18px", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
-                  color: accent, lineHeight: 1.4, display: "block", fontWeight: 500, transition: "color 3s",
-                  textShadow: `0 0 20px ${accent}60`,
-                }}>
-                  {highlightedQuote}
-                </span>
-                <span style={{
-                  fontSize: "14px", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
-                  color: "rgba(255,255,255,0.40)", lineHeight: 1.5, display: "block", marginTop: "8px",
-                }}>
-                  &ldquo;{highlightedTranslation}&rdquo;
-                </span>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Swipe hint */}
-          <motion.div
-            style={{ padding: "0 0 16px", textAlign: "center" }}
-            initial={{ opacity: 0.4 }}
-            animate={{ opacity: [0.4, 0.15, 0.4] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <p style={{ fontSize: "8px", letterSpacing: "0.25em", textTransform: "uppercase", fontFamily: "'Cinzel', serif", color: "rgba(255,255,255,0.3)", margin: 0 }}>
-              {eraIndex < ERAS.length - 1 ? "↑ SWIPE TO TRAVEL FORWARD" : "↓ SWIPE TO TRAVEL BACK"}
-            </p>
-          </motion.div>
         </div>
       </div>
     );
